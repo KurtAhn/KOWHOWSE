@@ -1,0 +1,34 @@
+{% extends "survey/base.html" %}
+
+{% block body %}
+<div class="parent" id="index">
+{% if surveys %}
+<table>
+    <tr>
+        <th>Survey</th>
+        <th>Created</th>
+        <th>Updated</th>
+        <th>Sections</th>
+        <th>Questions</th>
+        <th>Ongoing<br>Participants</th>
+        <th>Finished<br>Participants</th>
+        <th>Total<br>Participants</th>
+    </tr>
+    {% for survey in surveys %}
+    <tr>
+        <td><a href='/survey/{{survey.id}}'>{{survey}}</a></td>
+        <td>{{survey.created_date}}</td>
+        <td>{{survey.updated_date}}</td>
+        <td>{{survey.num_sections}}</td>
+        <td>{{survey.num_questions}}</td>
+        <td>{{survey.num_ongoing}}</td>
+        <td>{{survey.num_complete}}</td>
+        <td>{{survey.num_subjects}}</td>
+    </tr>
+    {% endfor %}
+</table>
+{%else%}
+<p>No surveys to display</p>
+{%endif%}
+</div>
+{% endblock %}

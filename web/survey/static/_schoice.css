@@ -1,0 +1,17 @@
+.schoice {
+    margin: 5px 0px;
+    padding: 5px;
+}
+
+.schoice:hover {
+    background-color: #DDD;
+}
+
+.schoice input[type='radio'] {
+    position:absolute;
+    visibility:hidden;
+}
+
+.schoice[checked] {
+    background-color: #999;
+}

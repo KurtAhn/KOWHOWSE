@@ -1,0 +1,32 @@
+.audio {
+}
+
+.audio .play {
+
+}
+/*
+.audio .play {
+    box-sizing: border-box;
+
+    border-color: transparent transparent transparent #444;
+    border-style: solid;
+    height: 2.5em;
+    border-width: 1.25em 0 1.25em 2.5em;
+
+    background-color: transparent;
+}
+
+.audio .play:active {
+    background-color: transparent;
+    border-left-color: black;
+}
+
+.audio .play:focus {
+    outline: none;
+}
+
+.audio .play[playing=true] {
+    border-style: double;
+    border-width: 0 0 0 2.5em;
+}
+*/

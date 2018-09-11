@@ -1,0 +1,31 @@
+label.arrow {
+    height: 16px;
+    width: 16px;
+    border: double black;
+    border-width: 0px 8px 8px 0px;
+    display: inline-block;
+}
+
+label.arrow:focus {
+    outline:none;
+}
+
+label.arrow:hover {
+    border-color: red;
+    cursor: pointer;
+}
+
+label.arrow--right {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(-45deg);
+}
+
+
+label.arrow--left {
+    transform: rotate(-45deg);
+    -webkit-transform: rotate(135deg);
+}
+
+label.arrow input[type="submit"] {
+    display:none;
+}

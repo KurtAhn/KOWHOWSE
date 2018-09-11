@@ -1,0 +1,47 @@
+{% load static %}
+{% get_media_prefix as MEDIA %}
+
+<!DOCTYPE html>
+<html style='height: 100%; '>
+<head>
+<link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+<link href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css" rel="stylesheet">
+<link rel="stylesheet" href="{% static 'css/bootstrap.css' %}"/>
+<link rel="stylesheet" href="{% static '_audio.css' %}"/>
+<link rel="stylesheet" href="{% static 'base.css' %}"/>
+<!--
+<link rel="stylesheet" href="{% static 'css/bootstrap-theme.css' %}"/>
+<link rel="stylesheet" href="{% static '_schoice.css' %}"/>
+<link rel="stylesheet" href="{% static '_arrow.css' %}"/> #}
+-->
+{% block style %}
+{% endblock %}
+
+<script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+<script type="text/javascript" src="{% static 'js/bootstrap.js' %}"></script>
+<script type="text/javascript" src="{% static 'base.js' %}"></script>
+<script type="text/javascript" src="{% static '_audio.js' %}"></script>
+<!--
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.3/umd/popper.min.js" integrity="sha384-ZMP7rVo3mIykV+2+9J3UJ46jBk0WLaUAdn689aCwoqbBJiSnjAK/l8WvCWPIPm49" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js" integrity="sha384-ChfqqxuZUCnJSK3+MXmPNIyE6ZbWh2IMqE241rYiqJxyMiZ6OW/JmZQ5stwEULTy" crossorigin="anonymous"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/jquery.marquee@1.5.0/jquery.marquee.min.js"></script>
+<script type="text/javascript" src="{% static '_schoice.js' %}"></script>
+-->
+{% block script %}
+{% endblock %}
+</head>
+
+<body style='height: 100%; border-style: dotted'>
+    <div class='fill'>
+        {% block body %}
+        {% endblock %}
+    </div>
+    <div class='footer-credit d-flex justify-content-center'>
+        <p>
+        Created with <a href="http://www.wikipedia.org" target="_blank">KOWHOWSE</a>
+        </p>
+    </div>
+</body>
+</html>

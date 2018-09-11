@@ -1,0 +1,30 @@
+{% extends "survey/base.html" %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'survey.css' %}"/>
+{% endblock %}
+
+{% block body %}
+<form action="" method="post" class='parent main main--survey'>
+<div class="parent core core--survey">
+    {%csrf_token%}
+    <div class='panel panel--text panel--text--survey'>
+        {% if survey.has_instruction %}
+            {% if survey.instruction_is_html %}
+                {% autoescape off %}
+                {{survey.instruction_content}}
+                {% endautoescape %}
+            {% else %}
+                {{survey.instruction_content}}
+            {% endif %}
+        {% else %}
+            No instructions for this survey
+        {% endif %}
+    </div>
+    <div class="parent panel panel--start">
+        {{form.description}}
+        <button type="submit" class="">Submit</button>
+    </div>
+</div>
+</form>
+{% endblock %}

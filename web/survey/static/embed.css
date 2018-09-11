@@ -1,0 +1,29 @@
+.embed {
+    flex-grow: 1;
+    justify-content: center;
+}
+
+.embed__content {
+    flex-grow: 1;
+    padding: 20px;
+    margin: 20px;
+    border-style: dotted;
+}
+
+.embed--survey {
+
+}
+
+.embed--survey em {
+    color: green;
+    font-weight: bold;
+    font-style: italic;
+}
+
+.embed--section {
+
+}
+
+.embed--question {
+
+}
