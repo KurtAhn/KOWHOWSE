@@ -1,0 +1,23 @@
+{% extends 'front/question.html' %}
+{% load static widgets i18n %}
+
+{% block style %}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/rangeslider.js/2.3.0/rangeslider.min.css"/>
+<link rel="stylesheet" href="{% static 'css/rangeslider.css' %}"></link>
+{% mushra.css width="80px" height="200px" base="5px" %}
+{% endblock %}
+
+{% block script %}
+<script src="{% static 'js/rangeslider.js' %}"></script>
+{% mushra.js %}
+{% endblock %}
+
+{% block question %}
+<div class="border d-flex justify-content-center bg-light rounded"
+     style="overflow:auto">
+    {% mushrareference audio=feed.reference %}
+{% for k, sample in feed.choices %}
+    {% mushrastimulus name=k audio=sample %}
+{% endfor %}
+</div>
+{% endblock %}

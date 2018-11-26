@@ -1,0 +1,51 @@
+{% load i18n %}
+<script>
+$(document).ready(function() {
+    var even = "text-secondary";
+    var odd = "text-dark font-italic font-weight-bold";
+    $mushra = $('.mushra');
+    $mushra.rangeslider({
+        polyfill: false,
+        rangeClass: 'track bg-light rounded border',
+        fillClass: 'progress bg-warning rounded',
+        handleClass: 'thumb thumb-mushra',
+        verticalClass: 'track-vertical track-mushra w-100',
+        disabledClass: 'track-disabled',
+        activeClass: 'track-active',
+        onInit: function() {
+            var adjectives = [
+                "{% trans 'Bad' %}",
+                "{% trans 'Poor' %}",
+                "{% trans 'Fair' %}",
+                "{% trans 'Good' %}",
+                "{% trans 'Excellent' %}"
+            ];
+
+            $ticks = $('<div class="ticks"/>');
+            for (var i = 10; i <= 90; i += 10) {
+                if (i % 20 == 0)
+                    $ticks.append($(
+                        `<div class="tick tick-mushra" style="bottom: ${i}%">
+                            <span class="${even}">-${i}-</span>
+                        </div>`
+                    ));
+                else
+                    $ticks.append($(
+                        `<div class="tick tick-mushra" style="bottom: ${i}%">
+                            <span class="${odd}">
+                                ${adjectives[(i - 10) / 20]}
+                            </span>
+                        </div>`
+                    ));
+            }
+
+            this.$range.append($ticks);
+        }
+    }).on('input', function() {
+        $("#"+$(this).attr('data-output'))[0].innerHTML = this.value;
+    });
+    $mushra.each(function () {
+        $("#"+$(this).attr('data-output'))[0].innerHTML = this.value;
+    });
+})
+</script>

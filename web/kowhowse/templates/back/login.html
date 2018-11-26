@@ -1,0 +1,63 @@
+{% extends "back/base_site.html" %}
+{% load i18n static widgets %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'css/login.css' %}"/>
+{% endblock %}
+
+{% block main %}
+<div class="d-flex justify-content-center">
+<div class="panel panel-primary login">
+<div class="panel-heading font-weight-bold">
+    {% trans "Administrator Log-in" %}
+    {% help "Create a superuser to access admin privilege" %}
+</div>
+<form class="panel-body"
+      action="{{ app_path }}"
+      method="post"
+      id="login-form">{% csrf_token %}
+
+{% if form.errors and not form.non_field_errors %}
+    <p class="text-danger">
+    {% if form.errors.items|length == 1 %}
+        {% trans "Please correct the error below." %}
+    {% else %}
+        {% trans "Please correct the errors below." %}
+    {% endif %}
+    </p>
+{% endif %}
+
+{% if form.non_field_errors %}
+{% for error in form.non_field_errors %}
+    <div class="alert alert-danger">
+        {% trans "Username or password is incorrect. Both fields are case-sensitive." %}
+    </div>
+{% endfor %}
+{% endif %}
+
+{% if user.is_authenticated %}
+    <p class="text-danger">
+{% blocktrans trimmed %}
+        You are authenticated as {{ username }}, but are not authorized to
+        access this page. Would you like to login to a different account?
+{% endblocktrans %}
+    </p>
+{% endif %}
+
+        <input class="form-control mb-2"
+               name="username" type="text" required autofocus
+               placeholder="{% trans "username" %}"/>
+
+        <input class="form-control mb-2"
+               name="password" type="password" required
+               placeholder="password"/>
+
+        <button class="btn btn-primary" type="submit">
+            {% trans 'Log in' %}
+        </button>
+
+        <input type="hidden" name="next" value="{{ next }}">
+</form>
+</div>
+</div>
+{% endblock %}

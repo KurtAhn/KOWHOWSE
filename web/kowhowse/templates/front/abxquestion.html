@@ -1,0 +1,13 @@
+{% extends 'front/question.html' %}
+
+{% load widgets %}
+{% block question %}
+<div class="form-group d-flex flex-column border"
+     style="flex: auto">
+    <div class="d-flex flex-row justify-content-center align-items-center flex-grow-1 text-center">
+        <span class="badge m-2">R</span>
+        {% playbutton audio=feed.X %}
+    </div>
+    {% aboptions feed %}
+</div>
+{% endblock question %}

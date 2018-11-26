@@ -1,0 +1,13 @@
+<div class="jumbotron border border-danger">
+    {% if instructable.has_instruction %}
+        {% if instructable.instruction_is_html %}
+            {% autoescape off %}
+            {{instructable.instruction_content}}
+            {% endautoescape %}
+        {% else %}
+            {{instructable.instruction_content}}
+        {% endif %}
+    {% else %}
+        {{error}}
+    {% endif %}
+</div>

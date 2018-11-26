@@ -1,0 +1,32 @@
+{% extends "base.html" %}
+
+{% block style %}
+<link rel="stylesheet" href="{% static 'survey.css' %}"/>
+{% endblock style %}
+
+{% block main %}
+<form action="" method="post">
+    {%csrf_token%}
+    <div class="d-flex flex-column justify-content-center">
+        <div class='jumbotron'>
+            {% if survey.has_instruction %}
+                {% if survey.instruction_is_html %}
+                    {% autoescape off %}
+                    {{survey.instruction_content}}
+                    {% endautoescape %}
+                {% else %}
+                    {{survey.instruction_content}}
+                {% endif %}
+            {% else %}
+                No instructions for this survey
+            {% endif %}
+        </div>
+        <div class="d-flex justify-content-center">
+            {% load filters %}
+            {# TODO Move the stupid filter thing to form class and be mindful of translation? #}
+            {{form.description|add_attr:'class=form-control&style=width:200px&placeholder=Your Name'}}
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    </div>
+</form>
+{% endblock main %}

@@ -1,2 +1,6 @@
 examples/
 media/
+*.old
+*.pyc
+migrations/
+__pycache__/

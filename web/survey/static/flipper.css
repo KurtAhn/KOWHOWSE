@@ -1,7 +1,0 @@
-.panel--flipper {
-    margin-top: auto;
-    flex-shrink: 0;
-
-    flex-direction: row-reverse;
-    justify-content: space-between;
-}

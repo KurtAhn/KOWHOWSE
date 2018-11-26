@@ -1,0 +1,9 @@
+{% load widgets %}
+
+<div class="flex-fill d-flex justify-content-center">
+{% if not feed.page_is_effectively_first %}
+    {% pagebutton form=form direction="prev" %}
+{% endif %}
+{% pagebutton form=form direction="next" %}
+</div>
+{% volume %}

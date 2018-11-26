@@ -1,0 +1,7 @@
+{% load widgets %}
+<div class="d-flex flex-column p-1">
+    <span id="{{name}}" class="badge badge-primary w-100 mb-1"></span>
+    {% playbutton audio=audio class='mb-1' %}
+    <input type="range" class="mushra" name="response-{{name}}"
+           data-orientation="vertical" data-output="{{name}}">
+</div>

@@ -1,0 +1,69 @@
+{% extends "back/base_site.html" %}
+{% load static widgets %}
+
+{% block style %}
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.19/css/dataTables.bootstrap4.min.css"/>
+{% endblock %}
+
+{% block script %}
+<script src="//cdn.datatables.net/1.10.19/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/1.10.19/js/dataTables.bootstrap4.min.js"></script>
+<script type="text/javascript">
+    $(document).ready(function() {
+        var table = $('#t')
+        var headers = $('#t thead th')
+        columnDefs = []
+        widths = []
+        for (var i = 0; i < headers.length; ++i) {
+            columnDefs.push(
+                {
+                    "targets": i,
+                    "searchable": true, // TODO Add this option to table.py
+                    "orderable": $(headers[i]).is('[orderable]')
+                }
+            )
+            widths.push($(headers[i]).attr('width'))
+        }
+
+
+        $('#t').DataTable({
+            "columnDefs": columnDefs,
+            "drawCallback": function (settings) {
+                $('[data-toggle]').tooltip();
+            }
+        });
+
+        total_width = 0.0;
+        for (var i = 0; i < headers.length; ++i)
+            total_width += parseFloat($(headers[i]).css("width").replace(/px/,""))
+        for (var i = 0; i < headers.length; ++i) {
+            width = parseFloat($(headers[i]).attr("width")) * total_width
+            $(headers[i]).css(
+                'width',
+                width
+            )
+        }
+    })
+</script>
+{% endblock %}
+
+{% block main %}
+<table id="t" class="table table-bordered table-striped" style="width: 100%; word-wrap: break-word">
+    <thead>
+        <tr>
+        {% for header in view.headers %}
+            {{header}}
+        {% endfor %}
+        </tr>
+    </thead>
+    <tbody>
+    {% for survey in view.surveys %}
+        <tr>
+        {% for header in view.headers %}
+            {% table_cell survey header %}
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

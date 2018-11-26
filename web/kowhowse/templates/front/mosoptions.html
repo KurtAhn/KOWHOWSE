@@ -1,0 +1,9 @@
+{% load widgets %}
+<div class="btn-group-vertical btn-group-toggle p-2
+            border" data-toggle="buttons">
+    {% for index, level in feed.choices %}
+        {% radio name="response" value=index required=True class="d-flex flex-row align-items-center flex-grow-1 btn-primary" %}
+            {{level.description}}
+        {% -radio %}
+    {% endfor %}
+</div>

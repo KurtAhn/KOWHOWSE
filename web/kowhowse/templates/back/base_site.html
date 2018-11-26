@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% load i18n %}
+
+{% block corner %}
+    {% trans "Backroom" %}
+{% endblock %}
+
+{% block nav %}
+    <div class="flex-fill justify-content-end">
+        <div class="navbar-nav">
+        {% if user.is_authenticated %}
+            <span class="navbar-text">
+                {% trans 'Welcome,' %}
+                <strong>{% firstof user.get_short_name user.get_username %}</strong>
+            </span>
+            <a class="navbar-text nav-link" href="{% url 'back:logout' %}">{% trans 'Log out' %}</a>
+        {% endif %}
+        </div>
+    </div>
+{% endblock %}

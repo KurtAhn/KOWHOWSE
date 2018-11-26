@@ -1,0 +1,40 @@
+
+<script>
+function toggle_audio(button) {
+    button.blur();
+    audio = $(button).parent().children('audio')[0];
+    $icon = $(button).children('span');
+
+    if ($icon.hasClass("{{play}}")) {
+        $icon.removeClass("{{play}}").addClass("{{pause}}");
+        audio.addEventListener("ended", function() {
+            $icon.removeClass("{{pause}}").addClass("{{play}}");
+        });
+        audio.play();
+    } else {
+        $icon.removeClass("{{pause}}").addClass("{{play}}");
+        audio.pause();
+    }
+}
+
+function update_volume(event) {
+    $('audio').each(function() {
+        this.volume = event.target.value;
+    })
+}
+
+$(document).ready(function() {
+    $('.btn-play').each(function() {
+        $(this).children('span').addClass("{{play}}");
+        $(this).click(function(event) {
+            event.stopPropagation();
+            toggle_audio(this);
+        })
+    });
+
+    $('.volume').on('input change', update_volume)
+    $('.volume').each(function() {
+        $(this).val(0.5).change();
+    });
+});
+</script>

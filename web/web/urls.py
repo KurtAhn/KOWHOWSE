@@ -13,14 +13,16 @@ Including another URLconf
     1. Import the include() function: from django.urls import include, path
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
-from django.contrib import admin
-from django.urls import path, include
+from django.urls import re_path, path, include
 from django.conf import settings
 from django.conf.urls.static import static
 
+import kowhowse.front.views as front
+import kowhowse.back.views as back
+
 urlpatterns = [
-    path('survey/', include('survey.urls')),
-    path('admin/', admin.site.urls),
+    re_path(r'^survey/', front.site.urls),
+    re_path(r'^backroom/', back.site.urls),
 ] +\
 static(settings.STATIC_URL, document_root=settings.STATIC_ROOT) +\
 static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

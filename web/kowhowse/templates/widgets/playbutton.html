@@ -1,0 +1,12 @@
+{% load static %}
+{% get_media_prefix as MEDIA %}
+
+<div class="d-flex justify-content-center {{class}}">
+    <audio preload="auto">
+        <source src="{{MEDIA}}{{audio.data}}" type="{{audio.data_format}}"/>
+        Audio format not supported.
+    </audio>
+    <button type="button" class="btn btn-dark btn-play">
+        <span class="fa fa-lg"/>
+    </button>
+</div>

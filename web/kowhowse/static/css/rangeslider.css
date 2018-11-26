@@ -1,0 +1,153 @@
+.track,
+.progress {
+  display: block;
+}
+
+.track {
+  position: relative;
+}
+
+.track-horizontal {
+  max-width: 100%;
+}
+
+.track-vertical {
+  max-height: 100%;
+}
+
+.track-disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
+  opacity: 0.4;
+}
+
+.progress {
+  position: absolute;
+}
+
+.track-horizontal .progress {
+  top: 0px;
+  height: 100%;
+}
+
+.track-vertical .progress {
+  bottom: 0px;
+  width: 100%;
+}
+
+.thumb {
+  position: absolute;
+}
+
+.thumb:after {
+  content: "";
+  display: block;
+  position: absolute;
+}
+
+.thumb:active, .track-active .thumb {
+}
+
+.track-horizontal .thumb {
+  touch-action: pan-y;
+  -ms-touch-action: pan-y;
+}
+
+.track-vertical .thumb {
+  touch-action: pan-x;
+  -ms-touch-action: pan-x;
+}
+
+.track:focus + .track .thumb {
+}
+
+.ticks {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+}
+
+.tick {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    cursor: default;
+}
+
+/*.beaker,
+.water {
+  display: block;
+}
+
+.beaker {
+  position: relative;
+}
+
+.beaker-horizontal {
+  max-width: 100%;
+}
+
+.beaker-vertical {
+  max-height: 100%;
+}
+
+.beaker-disabled {
+  filter: progid:DXImageTransform.Microsoft.Alpha(Opacity=40);
+  opacity: 0.4;
+}
+
+.water {
+  position: absolute;
+}
+
+.beaker-horizontal .water {
+  top: 0;
+  height: 100%;
+}
+
+.beaker-vertical .water {
+  bottom: 0px;
+  width: 100%;
+}
+
+.frontier {
+  position: absolute;
+}
+
+.frontier:after {
+  content: "";
+  display: block;
+  position: absolute;
+}
+
+.frontier:active, .beaker-active .frontier {
+}
+
+.beaker-horizontal .frontier {
+  touch-action: pan-y;
+  -ms-touch-action: pan-y;
+}
+
+.beaker-vertical .frontier {
+  touch-action: pan-x;
+  -ms-touch-action: pan-x;
+}
+
+.beaker:focus + .beaker .frontier {
+}
+
+.ticks {
+    position: absolute;
+    height: 100%;
+    width: 100%;
+    z-index: 2;
+}
+
+.tick {
+    text-align: center;
+    position: absolute;
+    width: 100%;
+    transform: translate(0%, 55%);
+    font-size: 0.7em;
+    cursor: default;
+}*/

@@ -1,0 +1,34 @@
+{% extends "back/base_site.html" %}
+{% load static widgets i18n %}
+
+{% block style %}
+<style>
+.btn-group .btn {
+    background: #000;
+    border-style: none
+}
+</style>
+{% endblock %}
+
+{% block script %}
+<script type="text/javascript">
+    $(document).ready(function() {
+        survey = {{survey}}
+    })
+</script>
+{% endblock %}
+
+{% block main %}
+{% foldy name="filters" expanded=True %}
+    {% foldyhead class="text-weight-bold" %}
+        {% trans "Filters" %}
+    {% -foldyhead %}
+    {% foldybody class="d-flex justify-content-between" %}
+    {% qtypefilters %}
+    {# {% completionfilters survey %} #}
+    {# {% sectionfilters survey %} #}
+    {% -foldybody %}
+{% -foldy %}
+
+
+{% endblock %}

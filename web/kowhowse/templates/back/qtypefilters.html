@@ -1,0 +1,14 @@
+{% load i18n widgets %}
+<div class="d-flex align-items-center m-1" id="qtypefilters">
+    <span class="font-weight-bold mr-3">{% trans "Question Types" %}</span>
+    <div class="btn-group btn-group-toggle" data-toggle="buttons">
+        {% radio name="qtype" value="mos" class="btn-primary" required=True active=True %}
+            MOS
+            <span class="badge badge-warning"></span>
+        {% -radio %}
+        {% radio name="qtype" value="ab" class="btn-primary" required=True %}
+            AB
+            <span class="badge badge-warning"></span>
+        {% -radio %}
+    </div>
+</div>
