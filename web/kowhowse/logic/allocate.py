@@ -1,5 +1,6 @@
-from .bitter import *
 import random
+from ..bitter import *
+from .paginate import Paginator
 
 
 class QuestionAllocator:
@@ -39,13 +40,3 @@ class QuestionAllocator:
                         feed = MosFeed(question=cast)
                         feed.sample = random.choice(list(cast.samples.all()))
                     feed.save()
-
-
-class ResponseValidator:
-    def __init__(self):
-        pass
-
-    def __call__(self, response):
-        return True
-
-question_allocator = QuestionAllocator()

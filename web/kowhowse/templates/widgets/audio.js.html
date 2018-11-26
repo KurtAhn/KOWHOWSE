@@ -21,6 +21,7 @@ function update_volume(event) {
     $('audio').each(function() {
         this.volume = event.target.value;
     })
+    sessionStorage.setItem("volume", event.target.value);
 }
 
 $(document).ready(function() {
@@ -32,9 +33,10 @@ $(document).ready(function() {
         })
     });
 
-    $('.volume').on('input change', update_volume)
+    $('.volume').on('input change', update_volume);
     $('.volume').each(function() {
-        $(this).val(0.5).change();
+        var volume = sessionStorage.getItem("volume");
+        $(this).val(volume === null ? 0.5 : volume);
     });
 });
 </script>
