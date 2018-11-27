@@ -3,40 +3,54 @@ from ..bitter import *
 from .paginate import Paginator
 
 
-class QuestionAllocator:
-    def __call__(self, survey, subject):
-        with Paginator(survey, subject):
-            for section in survey.sections.all():
-                feed = section.feeds.create()
-                feed.save()
+def allocate(survey, subject):
+    with Paginator(survey, subject):
+        for section in survey.sections.all():
+            section.feeds.create().save()
 
-                for question in section.questions.all():
-                    cast = question.cast()
-                    if question.species == 'AbQuestion':
-                        feed = AbFeed(question=cast)
-                        feed.save()
-                        feed.samples.add(*random.sample(list(cast.samples.all()), 2))
-                    elif question.species == 'AbxQuestion':
-                        feed = AbxFeed(question=cast)
-                        feed.save()
-                        feed.samples.add(*random.sample(list(cast.samples.all()), 2))
-                    elif question.species == 'MushraQuestion':
-                        feed = MushraFeed(question=cast)
-                        feed.save()
-                        feed.samples.add(random.choice(cast.samples.filter(role='R')))
-                        feed.samples.add(
-                            *random.sample(
-                                list(cast.anchors),
-                                cast.num_anchors or cast.anchors.count()
-                            )
-                        )
-                        feed.samples.add(
-                            *random.sample(
-                                list(cast.stimuli),
-                                cast.num_stimuli or cast.stimuli.count()
-                            )
-                        )
-                    elif question.species == 'MosQuestion':
-                        feed = MosFeed(question=cast)
-                        feed.sample = random.choice(list(cast.samples.all()))
-                    feed.save()
+            for question in section.questions.all():
+                {   'AbQuestion': create_abfeed,
+                    'AbxQuestion': create_abxfeed,
+                    'MosQuestion': create_mosfeed,
+                    'MushraQuestion': create_mushrafeed
+                }[question.species]\
+                    (question.cast()) # newline just to fool Atom
+
+
+def create_abfeed(question):
+    feed = AbFeed(question=question)
+    feed.save()
+    feed.samples.add(*random.sample(list(question.samples.all()), 2))
+    feed.save()
+
+
+def create_abxfeed(question):
+    feed = AbxFeed(question=question)
+    feed.save()
+    feed.samples.add(*random.sample(list(question.samples.all()), 2))
+    feed.save()
+
+
+def create_mosfeed(question):
+    feed = MosFeed(question=question)
+    feed.sample = random.choice(list(question.samples.all()))
+    feed.save()
+
+
+def create_mushrafeed(question):
+    feed = MushraFeed(question=question)
+    feed.save()
+    feed.samples.add(random.choice(question.references))
+    feed.samples.add(
+        *random.sample(
+            list(question.anchors),
+            question.num_anchors or question.anchors.count()
+        )
+    )
+    feed.samples.add(
+        *random.sample(
+            list(question.stimuli),
+            question.num_stimuli or question.stimuli.count()
+        )
+    )
+    feed.save()
