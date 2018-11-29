@@ -2,7 +2,7 @@ from ..bitter import *
 
 
 class Paginator:
-    feed_classes = [SectionFeed, AbFeed, AbxFeed, MushraFeed, MosFeed, NullFeed]
+    feed_classes = [SectionFeed, EndFeed, AbFeed, AbxFeed, MushraFeed, MosFeed]
 
     def __init__(self, survey, subject):
         self._survey = survey
@@ -32,10 +32,8 @@ class Paginator:
                 weak=False,
                 dispatch_uid='create_page_{}'.format(c.__name__)
             )
-        NullFeed().save()
 
     def __exit__(self, exc_type, exc_value, exc_tb):
-        NullFeed().save()
         for c in Paginator.feed_classes:
             signals.pre_save.disconnect(
                 sender=c,

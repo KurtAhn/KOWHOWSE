@@ -1,6 +1,6 @@
 import random
 from ..bitter import *
-from .paginate import Paginator
+from .pagination import Paginator
 
 
 def allocate(survey, subject):

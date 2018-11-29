@@ -33,8 +33,20 @@ class Command(BaseCommand):
         systems = {}
         samples = {}
         for _section in _survey:
-            section = survey.sections.create(description=_section.description)
+            if _section.__class__ == S.Section:
+                section = B.Section(
+                    survey=survey,
+                    description=_section.description
+                )
+            else:
+                section = B.End(
+                    survey=survey,
+                    description=_section.description
+                )
+            section.save()
+
             if _section.instruction:
+                print(_section.instruction)
                 with open(_section.instruction) as f:
                     section.instruction.save(path.basename(_section.instruction), File(f))
             section.save()

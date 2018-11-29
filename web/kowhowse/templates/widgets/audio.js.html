@@ -2,8 +2,8 @@
 <script>
 function toggle_audio(button) {
     button.blur();
-    audio = $(button).parent().children('audio')[0];
-    $icon = $(button).children('span');
+    var audio = $(button).parent().children('audio')[0];
+    var $icon = $(button).children('span');
 
     if ($icon.hasClass("{{play}}")) {
         $icon.removeClass("{{play}}").addClass("{{pause}}");

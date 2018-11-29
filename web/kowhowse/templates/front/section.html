@@ -11,7 +11,7 @@
       method="post"
       id="section-form"
       role="form">
-     {% csrf_token %}
+    {% csrf_token %}
     <div class="d-flex flex-column">
         {% instruction instructable=feed.section error="No instruction for this section" %}
     </div>

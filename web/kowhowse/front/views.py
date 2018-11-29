@@ -22,9 +22,21 @@ class SurveyView(FormView):
     name = 'survey'
     template_name = FrontSite.AP+'/survey.html'
     form_class = SubjectForm
+    success_url = 'do/'
+
+    def get_context_data(self, **kwargs):
+        kwargs['survey'] = get_object_or_404(
+            Survey, pk=kwargs.pop('survey')
+        )
+        return super().get_context_data(**kwargs)
+
+    def get(self, request, *args, **kwargs):
+        return self.render_to_response(self.get_context_data(**kwargs))
 
     def post(self, request, *args, **kwargs):
-        self.survey = Survey.objects.get(id=kwargs.pop('survey'))
+        self.survey = get_object_or_404(
+            Survey, pk=kwargs.pop('survey')
+        )
         return super().post(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -32,12 +44,8 @@ class SurveyView(FormView):
         subject.survey = self.survey
         subject.save()
         question_allocator(subject.survey, subject)
-        subject.flip_next()
         self.request.session['subject'] = subject.id
         return HttpResponseRedirect(self.get_success_url())
-
-    def get_success_url(self):
-        return 'do/'
 
     @staticmethod
     def locate(survey):
@@ -89,14 +97,12 @@ class SaveView(RedirectView):
         feed_id = self.request.POST.get('feed', None)
         if feed_id is not None:
             feed = Feed.objects.get(id=int(self.request.POST['feed'])).cast()
-            if isinstance(feed, MushraFeed):
-                feed.cook_response({
-                    k.replace('response-',''): v
-                    for k, v in self.request.POST.items()
-                    if k.startswith('response-')
-                })
-            else:
-                feed.cook_response(self.request.POST['response'])
+            ingredient = {
+                k.replace('response-',''): v
+                for k, v in self.request.POST.items()
+                if k.startswith('response-')
+            } if isinstance(feed, MushraFeed) else self.request.POST['response']
+            Response.cook(feed, ingredient)
 
         flip_direction = self.request.POST.get('page', '')
         if flip_direction == 'next':

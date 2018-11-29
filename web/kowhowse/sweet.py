@@ -87,6 +87,10 @@ class Section(Describable, Instructable):
         return iter(self.questions)
 
 
+class End(Section):
+    pass
+
+
 class Question(Describable, Instructable):
     def __init__(self, description, instruction):
         Describable.__init__(self, description)

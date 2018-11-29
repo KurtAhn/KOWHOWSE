@@ -1,4 +1,4 @@
-from .allocate import *
+from .allocation import *
 
 
 question_allocator = allocate
