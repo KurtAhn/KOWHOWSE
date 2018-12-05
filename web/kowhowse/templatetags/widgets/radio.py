@@ -25,31 +25,31 @@ def radio(parser, token):
         nodes,
         name=kwargs['name'],
         value=kwargs['value'],
-        idee=kwargs.get('id', FilterExpression("", parser)),
+        id_=kwargs.get('id', FilterExpression("", parser)),
         required=kwargs.get('required', FilterExpression("False", parser)),
         active=kwargs.get('active', FilterExpression("False", parser)),
-        klass=kwargs.get('class', FilterExpression("", parser))
+        class_=kwargs.get('class', FilterExpression("", parser))
     )
 
 
 class RadioNode(template.Node):
-    def __init__(self, nodes, name, value, idee, required, active, klass):
+    def __init__(self, nodes, name, value, id_, required, active, class_):
         self.nodes = nodes
         self.name = name
         self.value = value
-        self.idee = idee
+        self.id_ = id_
         self.required = required
         self.active = active
-        self.klass = klass
+        self.class_ = class_
 
     def render(self, context):
         name = self.name.resolve(context)
         value = self.value.resolve(context)
-        idee = self.value.resolve(context)
-        if not idee:
-            idee = '{}-{}'.format(name, value)
+        id_ = self.id_.resolve(context)
+        if not id_:
+            id_ = '{}-{}'.format(name, value)
 
-        klass = self.klass.resolve(context)
+        class_ = self.class_.resolve(context)
 
         try:
             required = bool(self.required.resolve(context))
@@ -61,22 +61,24 @@ class RadioNode(template.Node):
         except (ValueError, TypeError):
             active = False
 
-        output = '<label class="btn {active} {klass}">'
+        output = '<label class="btn {active} {class_}">'
         output += '<input type="radio" '\
                          'name="{name}" '\
                          'value="{value}" '\
-                         'id="{idee}" '\
-                         '{required}>'
+                         'id="{id_}" '\
+                         '{required}'\
+                         '{checked}>'
         for node in self.nodes:
             output += node.render(context)
         output += '</input></label>'
         output = mark_safe(output.format(
             name=name,
             value=value,
-            idee=idee,
+            id_=id_,
             required='required' if required else '',
             active='active' if active else '',
-            klass=klass if klass else ""
+            checked='checked' if active else '',
+            class_=class_ if class_ else ""
         ))
         # print(output)
         return output

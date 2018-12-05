@@ -1,4 +1,3 @@
-
 <script>
 function toggle_audio(button) {
     button.blur();
@@ -33,8 +32,16 @@ $(document).ready(function() {
         })
     });
 
-    $('.volume').on('input change', update_volume);
-    $('.volume').each(function() {
+    $('.volume').rangeslider({
+        polyfill: false,
+        rangeClass: 'track bg-light rounded',
+        fillClass: 'progress bg-success rounded',
+        handleClass: 'thumb',
+        horizontalClass: 'track-horizontal w-100',
+        disabledClass: 'track-disabled',
+        activeClass: 'track-active'
+    }).on('input change', update_volume)
+    .each(function() {
         var volume = sessionStorage.getItem("volume");
         $(this).val(volume === null ? 0.5 : volume);
     });

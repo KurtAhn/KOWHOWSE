@@ -17,7 +17,7 @@ class FrontSite(Site):
 
 
 class SurveyView(FormView):
-    url = r'^(?P<survey>\w+)/$'
+    url = r'^(?P<survey>\w{{{}}})/$'.format(Survey.UID_LENGTH)
     create = lambda: never_cache(SurveyView.as_view())
     name = 'survey'
     template_name = FrontSite.AP+'/survey.html'
@@ -26,7 +26,7 @@ class SurveyView(FormView):
 
     def get_context_data(self, **kwargs):
         kwargs['survey'] = get_object_or_404(
-            Survey, pk=kwargs.pop('survey')
+            Survey, uid=kwargs.pop('survey')
         )
         return super().get_context_data(**kwargs)
 
@@ -49,11 +49,12 @@ class SurveyView(FormView):
 
     @staticmethod
     def locate(survey):
-        return '/survey/{}'.format(survey.id)
+        print('Locating:', survey.uid)
+        return '/survey/{}'.format(survey.uid)
 
 
 class QuestionsView(TemplateView):
-    url = r'^(?P<survey>\w+)/do/$'
+    url = r'^(?P<survey>\w{{{}}})/do/$'.format(Survey.UID_LENGTH)
     create = lambda: never_cache(QuestionsView.as_view())
     name = 'questions'
     template_name = FrontSite.AP+'/questions.html'
@@ -73,10 +74,10 @@ class QuestionsView(TemplateView):
         return self.render_to_response(self.get_context_data(**kwargs))
 
     def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        feed = self.subject.current_feed().cast()
-        context['feed'] = feed
-        return context
+        if 'feed' not in kwargs:
+            kwargs['feed'] = self.subject.current_feed.cast()
+            print('sp', self.subject.current_feed.species)
+        return super().get_context_data(**kwargs)
 
 
 class SaveView(RedirectView):

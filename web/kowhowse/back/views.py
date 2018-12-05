@@ -137,7 +137,7 @@ class AnalysisView(TemplateView):
 
     @staticmethod
     def locate(survey):
-        return 'analyze?survey={}'.format(survey.id)
+        return 'analyze?survey={}'.format(survey.uid)
 
 
 site = BackSite()

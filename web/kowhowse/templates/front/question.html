@@ -2,6 +2,18 @@
 
 {% load widgets %}
 
+{% block style %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/rangeslider.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/_audio.css' %}"/>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+<script src="{% static 'js/rangeslider.js' %}"></script>
+{% audio.js %}
+{% endblock %}
+
 {% block nav %}
     {% nav_main form="question-form" %}
 {% endblock nav %}

@@ -1,0 +1,9 @@
+{% load widgets %}
+{% with "d-flex flex-row align-items-center flex-grow-1 btn-primary" as class %}
+{% radio name="response" value=value class=class active=active %}
+    <span class="badge m-2">{{index}}</span>
+    <div class="d-flex justify-content-center flex-grow-1 text-center">
+        {% playbutton audio=audio %}
+    </div>
+{% -radio %}
+{% endwith %}

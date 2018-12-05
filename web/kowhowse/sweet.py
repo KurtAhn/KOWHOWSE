@@ -19,9 +19,10 @@ class Instructable:
 
 
 class Survey(Describable, Instructable):
-    def __init__(self, description, instruction):
+    def __init__(self, description, instruction, public=True):
         Describable.__init__(self, description)
         Instructable.__init__(self, instruction)
+        self.public = public
         self.sections = []
 
     @property

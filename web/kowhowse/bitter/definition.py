@@ -2,10 +2,9 @@
 Classes used to define surveys; correspond to those in sweet.py.
 """
 from django.db import models
-from django.dispatch import receiver
-from django.db.models import signals
 from django.core.files import File
 from django.core.exceptions import ValidationError
+from django.core.validators import MinLengthValidator
 from django.utils.translation import gettext_lazy as _
 import os
 
@@ -38,8 +37,16 @@ class Instructable(models.Model):
 
 
 class Survey(Describable, Instructable):
+    UID_LENGTH = 4
+
     created_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
+    public = models.BooleanField()
+    uid = models.CharField(
+        validators=[MinLengthValidator(UID_LENGTH)],
+        max_length=UID_LENGTH,
+        primary_key=True
+    )
 
     @property
     def num_sections(self):
@@ -62,6 +69,10 @@ class Survey(Describable, Instructable):
     @property
     def num_complete(self):
         return len([s for s in self.subjects.all() if s.is_complete])
+
+    @property
+    def url(self):
+        return ''
 
 
 class System(Describable):
@@ -102,7 +113,6 @@ class Section(Describable, Instructable):
         on_delete=models.CASCADE,
         related_name='sections'
     )
-
     dummy = models.BooleanField()
 
 
@@ -192,27 +202,3 @@ class MosQuestion(Question):
     def clean(self):
         if len(self.levels) == 0:
             raise ValidationError(_('Positive number of levels required'))
-
-
-import sys, inspect, re
-
-# Add dummy to every Section object
-for c in [Section, End]:
-    def add_dummy(sender, instance, *args, **kwargs):
-        if instance.dummy is None:
-            instance.dummy = sender == End
-    receiver(signals.pre_save, sender=c, weak=False)(add_dummy)
-
-
-def add_species(c):
-    def signal(sender, instance, *args, **kwargs):
-        instance.species = c.__name__
-    return signal
-
-
-# Add species to every Question object
-for n, c in inspect.getmembers(
-    sys.modules[__name__],
-    lambda o: inspect.isclass(o) and re.search(r'\w+Question', o.__name__)
-):
-    receiver(signals.pre_save, sender=c, weak=False)(add_species(c))

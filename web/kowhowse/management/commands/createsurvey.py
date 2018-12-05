@@ -20,7 +20,10 @@ class Command(BaseCommand):
         spec.loader.exec_module(recipe)
 
         _survey = recipe.survey_definition()
-        survey = B.Survey(description=_survey.description)
+        survey = B.Survey(
+            description=_survey.description,
+            public=_survey.public
+        )
         if _survey.instruction:
             with open(_survey.instruction) as f:
                 survey.instruction.save(path.basename(_survey.instruction), File(f))
@@ -46,7 +49,6 @@ class Command(BaseCommand):
             section.save()
 
             if _section.instruction:
-                print(_section.instruction)
                 with open(_section.instruction) as f:
                     section.instruction.save(path.basename(_section.instruction), File(f))
             section.save()

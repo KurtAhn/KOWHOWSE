@@ -39,7 +39,11 @@ class AbResponse(Response):
 
     @staticmethod
     def cook(feed, ingredient):
-        AbResponse(feed=feed, value=feed[ingredient]).save()
+        if not hasattr(feed, 'response'):
+            AbResponse(feed=feed, value=feed[ingredient]).save()
+        else:
+            feed.response.value = feed[ingredient]
+            feed.response.save()
 
 
 class AbxResponse(Response):
@@ -56,7 +60,11 @@ class AbxResponse(Response):
 
     @staticmethod
     def cook(feed, ingredient):
-        AbxResponse(feed=feed, value=feed[ingredient]).save()
+        if not hasattr(feed, 'response'):
+            AbxResponse(feed=feed, value=feed[ingredient]).save()
+        else:
+            feed.response.value = feed[ingredient]
+            feed.response.save()
 
 
 class MushraResponse(Response):
@@ -68,16 +76,22 @@ class MushraResponse(Response):
 
     @staticmethod
     def cook(feed, ingredient):
-        response = MushraResponse(feed=feed)
-        response.save()
-        for k, v in ingredient.items():
-            bit = MushraResponseBit(
+        if not hasattr(feed, 'response'):
+            response = MushraResponse(feed=feed)
+            response.save()
+            for k, v in ingredient.items():
+                bit = MushraResponseBit(
                 whole=response,
                 sample=feed[int(k)],
                 value=int(v)
-            )
-            bit.save()
-            response.bits.add(bit)
+                )
+                bit.save()
+                response.bits.add(bit)
+        else:
+            for k, v in ingredient.items():
+                bit = feed.response.bits.get(sample_id=int(k))
+                bit.value = int(v)
+                bit.save()
 
 
 class MushraResponseBit(models.Model):
@@ -112,4 +126,8 @@ class MosResponse(Response):
 
     @staticmethod
     def cook(feed, ingredient):
-        MosResponse(feed=feed, value=feed[int(ingredient)]).save()
+        if not hasattr(feed, 'response'):
+            MosResponse(feed=feed, value=feed[int(ingredient)]).save()
+        else:
+            feed.response.value = feed[int(ingredient)]
+            feed.response.save()

@@ -14,9 +14,25 @@ def instruction(instructable, error):
     return {'instructable': instructable, 'error': _(error)}
 
 
+@register.inclusion_tag('front/aboption.html')
+def aboption(value, response):
+    print('r:', response)
+    return {'value': value, 'active': value == response}
+
+
 @register.inclusion_tag('front/aboptions.html')
 def aboptions(feed):
-    return {'feed': feed}
+    response = feed.response.value if hasattr(feed, 'response') else None
+    for k, v in feed.choices():
+        print(k, v, response, v==response)
+    return {'options': [
+        dict(
+            value=k,
+            active=v==response,
+            audio=v
+        )
+        for k, v in feed.choices()
+    ]}
 
 
 @register.inclusion_tag('front/mosoptions.html')
@@ -37,6 +53,7 @@ def mushrareference(audio):
 @register.inclusion_tag('front/mushra.js.html', name='mushra.js')
 def mushra_js():
     return {}
+
 
 @register.inclusion_tag('front/mushra.css.html', name='mushra.css')
 def mushra_css(width, height, base='0px'):

@@ -1,10 +1,7 @@
 from django.db import models
-from django.dispatch import receiver
-from django.db.models import signals
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
-from random import Random, randint
-import sys
+from random import Random
 from .definition import *
 
 
@@ -15,6 +12,7 @@ class Subject(Describable):
         related_name='subjects'
     )
 
+    @property
     def current_feed(self):
         page = self.pages.get(is_current=True)
         return page.feed
@@ -123,7 +121,7 @@ class QuestionFeed(Feed):
     class Meta:
         abstract = True
 
-    seed = models.IntegerField(null=True) #Move to PreferenceFeed?
+    seed = models.IntegerField() #Move to PreferenceFeed?
 
     @property
     def is_complete(self):
@@ -155,9 +153,10 @@ class AbFeed(PreferenceFeed):
             raise ValidationError(_('There needs to be exactly two systems to compare'))
 
     def __getitem__(self, key):
-        r = Random(self.seed)
-        mapping = dict(zip('AB', r.sample(list(self.samples.all()), 2)))
-        return mapping[key]
+        if not hasattr(self, '_mapping'):
+            r = Random(self.seed)
+            self._mapping = dict(zip('AB', r.sample(list(self.samples.all()), 2)))
+        return self._mapping[key]
 
     def choices(self):
         for k in 'AB':
@@ -260,31 +259,17 @@ class EndFeed(Feed):
         return True
 
 
-@receiver(signals.pre_save, sender=SectionFeed)
-def SectionFeed_pre(sender, instance, *args, **kwargs):
-    instance.species = 'SectionFeed'
-
-@receiver(signals.pre_save, sender=QuestionFeed)
-def QuestionFeed_pre(sender, instance, *args, **kwargs):
-    if instance.seed == None:
-        instance.seed = randint(-sys.maxsize - 1, sys.maxsize)
-
-@receiver(signals.pre_save, sender=AbFeed)
-def AbFeed_pre(sender, instance, *args, **kwargs):
-    instance.species = 'AbFeed'
-
-@receiver(signals.pre_save, sender=AbxFeed)
-def AbxFeed_pre(sender, instance, *args, **kwargs):
-    instance.species = 'AbxFeed'
-
-@receiver(signals.pre_save, sender=MushraFeed)
-def MushraFeed_pre(sender, instance, *args, **kwargs):
-    instance.species = 'MushraFeed'
-
-@receiver(signals.pre_save, sender=MosFeed)
-def MosFeed_pre(sender, instance, *args, **kwargs):
-    instance.species = 'MosFeed'
-
-@receiver(signals.pre_save, sender=EndFeed)
-def EndFeed_pre(sender, instance, *args, **kwargs):
-    instance.species = 'EndFeed'
+# for n, c in inspect.getmembers(
+#     sys.modules[__name__],
+#     lambda o: inspect.isclass(o) and \
+#               re.search(r'\w+Feed', o.__name__)
+# ):
+#     if re.search(r'(End|Section)Feed', c.__name__):
+#         def signal(sender, instance, *args, **kwargs):
+#             instance.species = sender.__name__
+#     else:
+#         def signal(sender, instance, *args, **kwargs):
+#             if instance.seed == None:
+#                 instance.seed = randint(-sys.maxsize -1, sys.maxsize)
+#             instance.species = sender.__name__
+#     receiver(signals.pre_save, sender=c, weak=False)(signal)
