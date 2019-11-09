@@ -1,11 +1,12 @@
-from .utils import *
 from django.utils.translation import gettext_lazy as _
-from ...bitter import Instructable
+from django.shortcuts import get_object_or_404
+from .utils import *
+from ...bitter import *
 
 
 @register.inclusion_tag('back/qtypefilters.html')
-def qtypefilters():
-    return {'num_mos': 10}
+def qtypefilters(survey):
+    return {}
 
 
 @register.inclusion_tag('front/instruction.html')
@@ -16,19 +17,16 @@ def instruction(instructable, error):
 
 @register.inclusion_tag('front/aboption.html')
 def aboption(value, response):
-    print('r:', response)
     return {'value': value, 'active': value == response}
 
 
 @register.inclusion_tag('front/aboptions.html')
 def aboptions(feed):
     response = feed.response.value if hasattr(feed, 'response') else None
-    for k, v in feed.choices():
-        print(k, v, response, v==response)
     return {'options': [
         dict(
             value=k,
-            active=v==response,
+            active=v == response,
             audio=v
         )
         for k, v in feed.choices()

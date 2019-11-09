@@ -73,7 +73,6 @@ class FoldyNode(template.Node):
             expanded = False
 
         output = '<div class="card {klass}">'
-        # print(output)
         for node in self.nodes:
             if isinstance(node, FoldyheadNode):
                 output += node.render(context)
@@ -100,7 +99,6 @@ class FoldyheadNode(template.Node):
                       'data-toggle="collapse" '\
                       'data-target="#{{name}}-body" '\
                       'aria-expanded="{{expanded}}">'
-        # print(output)
         for node in self.nodes:
             output += node.render(context)
         output += '</div>'
@@ -119,7 +117,6 @@ class FoldybodyNode(template.Node):
                       'class="collapse show" '\
                       'aria-labelledby="{{name}}-head">'
         output += '<div class="card-body {klass}">'
-        # print(output)
         for node in self.nodes:
             output += node.render(context)
         output += '</div>'*2

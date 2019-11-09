@@ -4,11 +4,15 @@
     <div class="btn-group btn-group-toggle" data-toggle="buttons">
         {% radio name="qtype" value="mos" class="btn-primary" required=True active=True %}
             MOS
-            <span class="badge badge-warning"></span>
+            <span id="num_mos" class="badge badge-warning"/>
         {% -radio %}
         {% radio name="qtype" value="ab" class="btn-primary" required=True %}
             AB
-            <span class="badge badge-warning"></span>
+            <span id="num_ab" class="badge badge-warning"/>
+        {% -radio %}
+        {% radio name="qtype" value="abx" class="btn-primary" required=True %}
+            ABX
+            <span id="num_abx" class="badge badge-warning"/>
         {% -radio %}
     </div>
 </div>

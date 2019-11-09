@@ -1,11 +1,11 @@
 {% if feed.species == "SectionFeed" %}
-    {% include "front/section.html" with feed=feed %}
+    {% include "front/section.html" with feed=feed error=error %}
 {% elif feed.species == "AbFeed" %}
-    {% include "front/abquestion.html" with feed=feed %}
+    {% include "front/abquestion.html" with feed=feed error=error %}
 {% elif feed.species == "AbxFeed" %}
-    {% include "front/abxquestion.html" with feed=feed %}
+    {% include "front/abxquestion.html" with feed=feed error=error %}
 {% elif feed.species == "MosFeed" %}
-    {% include "front/mosquestion.html" with feed=feed %}
+    {% include "front/mosquestion.html" with feed=feed error=error %}
 {% elif feed.species == 'MushraFeed' %}
-    {% include "front/mushraquestion.html" with feed=feed %}
+    {% include "front/mushraquestion.html" with feed=feed error=error %}
 {% endif %}

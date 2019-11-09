@@ -80,5 +80,4 @@ class RadioNode(template.Node):
             checked='checked' if active else '',
             class_=class_ if class_ else ""
         ))
-        # print(output)
         return output

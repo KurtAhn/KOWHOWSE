@@ -2,12 +2,24 @@
 
 {% load widgets %}
 
+{% block style %}
+{{block.super}}
+<link rel="stylesheet" href="{% static 'css/rangeslider.css' %}"/>
+<link rel="stylesheet" href="{% static 'css/_audio.css' %}"/>
+{% endblock %}
+
+{% block script %}
+{{block.super}}
+<script src="{% static 'js/rangeslider.js' %}"></script>
+{% audio.js %}
+{% endblock %}
+
 {% block nav %}
 {% nav_main form="section-form" %}
 {% endblock nav %}
 
 {% block main %}
-<form action="{% url 'front:save' survey %}"
+<form action=""
       method="post"
       id="section-form"
       role="form">
@@ -16,4 +28,4 @@
         {% instruction instructable=feed.section error="No instruction for this section" %}
     </div>
 </form>
-{% endblock main %}
+{% endblock %}

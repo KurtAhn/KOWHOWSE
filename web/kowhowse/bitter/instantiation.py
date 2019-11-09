@@ -74,6 +74,7 @@ class Page(models.Model):
     def is_complete(self):
         return self.feed.is_complete
 
+    # FIXME No longer using NullFeed
     def is_effectively_first(self):
         return self.prev_page.feed.species == 'NullFeed'
 
@@ -121,11 +122,12 @@ class QuestionFeed(Feed):
     class Meta:
         abstract = True
 
-    seed = models.IntegerField() #Move to PreferenceFeed?
+    seed = models.IntegerField()
 
     @property
     def is_complete(self):
-        return hasattr(self, 'response')
+        return self.response.is_complete
+        # return hasattr(self, 'response')
 
 
 class PreferenceFeed(QuestionFeed):
@@ -137,7 +139,14 @@ class PreferenceFeed(QuestionFeed):
     def clean(self):
         for sample in self.samples:
             if sample not in self.question.samples:
-                raise ValidationError(_('Invalid sample'))
+                raise ValidationError(
+                    _('%(sample)s is an invalid sample'),
+                    code='corrupt',
+                    param={
+                        'sample': sample
+                    }
+                )
+        super().clean()
 
 
 class AbFeed(PreferenceFeed):
@@ -148,14 +157,18 @@ class AbFeed(PreferenceFeed):
     )
 
     def clean(self):
-        PreferenceFeed.clean(self)
-        if len(self.samples) > 2:
-            raise ValidationError(_('There needs to be exactly two systems to compare'))
+        if self.samples.count() != 2:
+            raise ValidationError(
+                _('There needs to be exactly two systems to compare'),
+                code='corrupt'
+            )
+        super().clean()
 
     def __getitem__(self, key):
         if not hasattr(self, '_mapping'):
             r = Random(self.seed)
-            self._mapping = dict(zip('AB', r.sample(list(self.samples.all()), 2)))
+            self._mapping = dict(
+                zip('AB', r.sample(list(self.samples.all()), 2)))
         return self._mapping[key]
 
     def choices(self):
@@ -171,9 +184,11 @@ class AbxFeed(PreferenceFeed):
     )
 
     def clean(self):
-        PreferenceFeed.clean(self)
-        if len(self.samples) > 2:
-            raise ValidationError(_('There needs to be exactly two samples to compare'))
+        if self.samples.count() != 2:
+            raise ValidationError(
+                _('There needs to be exactly two samples to compare')
+            )
+        super().clean()
 
     def __getitem__(self, key):
         r = Random(self.seed)
@@ -237,7 +252,8 @@ class MosFeed(QuestionFeed):
         on_delete=models.CASCADE,
         related_name='feeds'
     )
-    sample = models.ForeignKey(Audio, on_delete=models.CASCADE, related_name='mos_feeds')
+    sample = models.ForeignKey(
+        Audio, on_delete=models.CASCADE, related_name='mos_feeds')
 
     def clean(self):
         if self.sample not in self.question.samples:
@@ -257,19 +273,3 @@ class EndFeed(Feed):
     @property
     def is_complete(self):
         return True
-
-
-# for n, c in inspect.getmembers(
-#     sys.modules[__name__],
-#     lambda o: inspect.isclass(o) and \
-#               re.search(r'\w+Feed', o.__name__)
-# ):
-#     if re.search(r'(End|Section)Feed', c.__name__):
-#         def signal(sender, instance, *args, **kwargs):
-#             instance.species = sender.__name__
-#     else:
-#         def signal(sender, instance, *args, **kwargs):
-#             if instance.seed == None:
-#                 instance.seed = randint(-sys.maxsize -1, sys.maxsize)
-#             instance.species = sender.__name__
-#     receiver(signals.pre_save, sender=c, weak=False)(signal)

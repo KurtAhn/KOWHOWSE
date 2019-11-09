@@ -2,6 +2,7 @@
 {% load static widgets i18n %}
 
 {% block style %}
+{{block.super}}
 <style>
 .btn-group .btn {
     background: #000;
@@ -11,9 +12,26 @@
 {% endblock %}
 
 {% block script %}
+{{block.super}}
 <script type="text/javascript">
     $(document).ready(function() {
-        survey = {{survey}}
+        var responses = JSON.parse(unescape("{{responses | safe | escapejs}}"));
+        alert(unescape("{{responses | safe | escapejs}}"));
+        $('#num_mos').html(responses.filter(
+            function(e) {
+                return e.species == 'mos'
+            }
+        ).length);
+        $('#num_ab').html(responses.filter(
+            function(e) {
+                return e.species == 'ab'
+            }
+        ).length);
+        $('#num_abx').html(responses.filter(
+            function(e) {
+                return e.species == 'abx'
+            }
+        ).length);
     })
 </script>
 {% endblock %}
@@ -24,7 +42,7 @@
         {% trans "Filters" %}
     {% -foldyhead %}
     {% foldybody class="d-flex justify-content-between" %}
-    {% qtypefilters %}
+    {% qtypefilters survey %}
     {# {% completionfilters survey %} #}
     {# {% sectionfilters survey %} #}
     {% -foldybody %}

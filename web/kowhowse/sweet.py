@@ -2,9 +2,6 @@
 Syntax sugar for bitter.py that hides away relational DB shenanigans so
 the developer can create surveys with just basic Python.
 """
-from os import path
-
-
 class Describable:
     def __init__(self, description):
         self.description = description
@@ -146,7 +143,13 @@ class MosLevel(Describable):
         return not(self == other)
 
 
-class MosQuestion(Question):
-    def __init__(self, description, instruction, levels):
-        Question.__init__(self, description, instruction)
+class MosScale(Describable):
+    def __init__(self, description, levels):
+        Describable.__init__(self, description)
         self.levels = levels
+
+
+class MosQuestion(Question):
+    def __init__(self, description, instruction, scales):
+        Question.__init__(self, description, instruction)
+        self.scales = scales

@@ -17,10 +17,12 @@ class FrontSite(Site):
 
 
 class SurveyView(FormView):
-    url = r'^(?P<survey>\w{{{}}})/$'.format(Survey.UID_LENGTH)
-    create = lambda: never_cache(SurveyView.as_view())
+    url = rf'^(?P<survey>[\w\-]{{{Survey.UID_LENGTH}}})/$'
+
+    @staticmethod
+    def create(): return never_cache(SurveyView.as_view())
     name = 'survey'
-    template_name = FrontSite.AP+'/survey.html'
+    template_name = FrontSite.AP + '/survey.html'
     form_class = SubjectForm
     success_url = 'do/'
 
@@ -49,21 +51,23 @@ class SurveyView(FormView):
 
     @staticmethod
     def locate(survey):
-        print('Locating:', survey.uid)
         return '/survey/{}'.format(survey.uid)
 
 
 class QuestionsView(TemplateView):
-    url = r'^(?P<survey>\w{{{}}})/do/$'.format(Survey.UID_LENGTH)
-    create = lambda: never_cache(QuestionsView.as_view())
+    url = fr'^(?P<survey>[\w\-]{{{Survey.UID_LENGTH}}})/do/$'
+
+    @staticmethod
+    def create(): return never_cache(QuestionsView.as_view())
     name = 'questions'
-    template_name = FrontSite.AP+'/questions.html'
+    template_name = FrontSite.AP + '/questions.html'
 
     def initialize(self, request, *args, **kwargs):
         self.subject = get_object_or_404(
             Subject,
             pk=self.request.session.get('subject', None)
         )
+        self.feed = self.subject.current_feed.cast()
 
     def get(self, request, *args, **kwargs):
         self.initialize(request, *args, **kwargs)
@@ -71,50 +75,30 @@ class QuestionsView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         self.initialize(request, *args, **kwargs)
-        return self.render_to_response(self.get_context_data(**kwargs))
+        ingredient = {
+            k.replace('response-', ''): v
+            for k, v in self.request.POST.items()
+            if k.startswith('response-')
+        } if isinstance(self.feed, MushraFeed) \
+            else self.request.POST.get('response', None)
 
-    def get_context_data(self, **kwargs):
-        if 'feed' not in kwargs:
-            kwargs['feed'] = self.subject.current_feed.cast()
-            print('sp', self.subject.current_feed.species)
-        return super().get_context_data(**kwargs)
-
-
-class SaveView(RedirectView):
-    url = r'^(?P<survey>\w+)/do/save$'
-    create = lambda: never_cache(SaveView.as_view())
-    name = 'save'
-    pattern_name = 'questions'
-
-    def initialize(self, request, *args, **kwargs):
-        self.subject = get_object_or_404(
-            Subject,
-            pk=self.request.session.get('subject', None)
-        )
-
-    def post(self, request, *args, **kwargs):
-        self.initialize(request, *args, **kwargs)
-
-        feed_id = self.request.POST.get('feed', None)
-        if feed_id is not None:
-            feed = Feed.objects.get(id=int(self.request.POST['feed'])).cast()
-            ingredient = {
-                k.replace('response-',''): v
-                for k, v in self.request.POST.items()
-                if k.startswith('response-')
-            } if isinstance(feed, MushraFeed) else self.request.POST['response']
-            Response.cook(feed, ingredient)
+        try:
+            Response.cook(self.feed, ingredient)
+        except ValidationError as e:
+            return self.render_to_response(self.get_context_data(**kwargs, error=e))
 
         flip_direction = self.request.POST.get('page', '')
         if flip_direction == 'next':
             self.subject.flip_next()
         elif flip_direction == 'prev':
             self.subject.flip_prev()
-        return super().post(request, *args, **kwargs)
+        return redirect('front:questions', survey=kwargs['survey'])
 
-    def get_redirect_url(self, *args, **kwargs):
-        return '/survey/{}/do'.format(kwargs['survey'])
+    def get_context_data(self, **kwargs):
+        if 'feed' not in kwargs:
+            kwargs['feed'] = self.feed
+        return super().get_context_data(**kwargs)
 
 
 site = FrontSite()
-site.register(SurveyView, QuestionsView, SaveView)
+site.register(SurveyView, QuestionsView)

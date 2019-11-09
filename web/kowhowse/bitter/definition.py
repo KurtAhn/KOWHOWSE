@@ -4,9 +4,10 @@ Classes used to define surveys; correspond to those in sweet.py.
 from django.db import models
 from django.core.files import File
 from django.core.exceptions import ValidationError
-from django.core.validators import MinLengthValidator
+from django.core.validators import MinLengthValidator, MinValueValidator
 from django.utils.translation import gettext_lazy as _
 import os
+from pickle import dumps, loads
 
 
 class Describable(models.Model):
@@ -104,7 +105,7 @@ class Audio(Describable):
     )
 
     def data_format(self):
-        return 'audio/'+self.data.path.split('.')[-1]
+        return 'audio/' + self.data.path.split('.')[-1]
 
 
 class Section(Describable, Instructable):
@@ -117,12 +118,15 @@ class Section(Describable, Instructable):
 
 
 class End(Section):
-   class Meta:
-       proxy = True
+    class Meta:
+        proxy = True
 
-   def clean(self):
-       if self.questions.exists():
-           raise ValidationError(_('End section must not contain questions'))
+    def clean(self):
+        if self.questions.exists():
+            raise ValidationError(
+                _('End section must not contain questions'),
+                code='invalid'
+            )
 
 
 class Question(Describable, Instructable):
@@ -133,6 +137,7 @@ class Question(Describable, Instructable):
         related_name='%(class)ss'
     )
     samples = models.ManyToManyField(Audio, related_name='%(class)ss')
+    validators = models.BinaryField()
 
     def cast(self):
         return {
@@ -141,6 +146,10 @@ class Question(Describable, Instructable):
             'MushraQuestion': MushraQuestion,
             'MosQuestion': MosQuestion
         }[self.species].objects.get(pk=self.id)
+
+    @property
+    def restored_validators(self):
+        yield from loads(self.validators)
 
 
 class AbQuestion(Question):
@@ -153,10 +162,16 @@ class AbxQuestion(Question):
 
 class MushraQuestion(Question):
     # Number of anchors to display per feed; leave as null to display all provided
-    num_anchors = models.PositiveIntegerField(null=True)
+    num_anchors = models.IntegerField(
+        validators=[MinValueValidator(0)],
+        null=True
+    )
     # Number of stimuli (samples excluding anchors and reference) per feed;
     # leave as null to display all
-    num_stimuli = models.PositiveIntegerField(null=True)
+    num_stimuli = models.IntegerField(
+        validators=[MinValueValidator(0)],
+        null=True
+    )
 
     @property
     def references(self):
@@ -173,6 +188,11 @@ class MushraQuestion(Question):
 
 class MosLevel(Describable):
     value = models.FloatField()
+    scale = models.ForeignKey(
+        'MosScale',
+        on_delete=models.CASCADE,
+        related_name='%(class)ss'
+    )
 
     def __hash__(self):
         return hash(self.value)
@@ -196,9 +216,24 @@ class MosLevel(Describable):
         return not(self == other)
 
 
-class MosQuestion(Question):
-    levels = models.ManyToManyField(MosLevel, related_name='%(class)ss')
-
+class MosScale(Describable):
     def clean(self):
         if len(self.levels) == 0:
-            raise ValidationError(_('Positive number of levels required'))
+            raise ValidationError(
+                _('At least one level required'),
+                code='invalid'
+            )
+
+
+class MosQuestion(Question):
+    scales = models.ManyToManyField(
+        MosScale,
+        related_name='%(class)ss'
+    )
+
+    def clean(self):
+        if len(self.scales) == 0:
+            raise ValidationError(
+                _('At least one scale required'),
+                code='invalid'
+            )

@@ -1,4 +1,5 @@
 from django.db import models
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
 from .instantiation import *
@@ -8,17 +9,26 @@ class Response(models.Model):
     class Meta:
         abstract = True
 
+    # TODO Implement duration tracking
     start_date = models.DateTimeField(auto_now_add=True)
     end_date = models.DateTimeField(null=True)
 
+    def clean(self):
+        for v in self.feed.question.restored_validators:
+            v(self)
+        super().clean()
+
     @staticmethod
     def cook(feed, ingredient):
-        return {
-            AbFeed: AbResponse,
-            AbxFeed: AbxResponse,
-            MosFeed: MosResponse,
-            MushraFeed: MushraResponse
-        }[feed.__class__].cook(feed, ingredient)
+        try:
+            {
+                AbFeed: AbResponse,
+                AbxFeed: AbxResponse,
+                MosFeed: MosResponse,
+                MushraFeed: MushraResponse
+            }[feed.__class__].cook(feed, ingredient)
+        except KeyError:
+            pass
 
 
 class AbResponse(Response):
@@ -30,20 +40,20 @@ class AbResponse(Response):
     value = models.ForeignKey(
         Audio,
         on_delete=models.CASCADE,
-        related_name='%(class)ss'
+        related_name='%(class)ss',
+        null=True
     )
 
-    def clean(self):
-        if value not in self.feed.samples:
-            raise ValidationError(_('Response value is not one of the options'))
+    @property
+    def is_complete(self):
+        return self.value is not None
 
     @staticmethod
     def cook(feed, ingredient):
-        if not hasattr(feed, 'response'):
-            AbResponse(feed=feed, value=feed[ingredient]).save()
-        else:
+        if ingredient is not None:
             feed.response.value = feed[ingredient]
-            feed.response.save()
+        feed.response.clean()
+        feed.response.save()
 
 
 class AbxResponse(Response):
@@ -52,19 +62,23 @@ class AbxResponse(Response):
         on_delete=models.CASCADE,
         related_name='response'
     )
-    value = models.ForeignKey(Audio, on_delete=models.CASCADE, related_name='%(class)ss')
+    value = models.ForeignKey(
+        Audio,
+        on_delete=models.CASCADE,
+        related_name='%(class)ss',
+        null=True
+    )
 
-    def clean(self):
-        if value not in self.feed.samples[:2]:
-            raise ValidationError(_('Response value is not one of the options'))
+    @property
+    def is_complete(self):
+        return self.value is not None
 
     @staticmethod
     def cook(feed, ingredient):
-        if not hasattr(feed, 'response'):
-            AbxResponse(feed=feed, value=feed[ingredient]).save()
-        else:
+        if ingredient is not None:
             feed.response.value = feed[ingredient]
-            feed.response.save()
+        feed.response.clean()
+        feed.response.save()
 
 
 class MushraResponse(Response):
@@ -74,24 +88,23 @@ class MushraResponse(Response):
         related_name='response'
     )
 
+    @property
+    def is_complete(self):
+        # FIXME prolly wrong lol
+        try:
+            self.clean()
+            return True
+        except ValidationError:
+            return False
+
     @staticmethod
     def cook(feed, ingredient):
-        if not hasattr(feed, 'response'):
-            response = MushraResponse(feed=feed)
-            response.save()
-            for k, v in ingredient.items():
-                bit = MushraResponseBit(
-                whole=response,
-                sample=feed[int(k)],
-                value=int(v)
-                )
-                bit.save()
-                response.bits.add(bit)
-        else:
-            for k, v in ingredient.items():
-                bit = feed.response.bits.get(sample_id=int(k))
-                bit.value = int(v)
-                bit.save()
+        for k, v in ingredient.items():
+            bit = feed.response.bits.get(sample_id=int(k))
+            bit.value = int(v)
+            bit.clean()
+            bit.save()
+        response.clean()
 
 
 class MushraResponseBit(models.Model):
@@ -105,11 +118,10 @@ class MushraResponseBit(models.Model):
         on_delete=models.CASCADE,
         related_name='%(class)ss'
     )
-    value = models.PositiveIntegerField()
-
-    def clean(self):
-        if not (self.value <= 100):
-            raise ValidationError(_('Response value out of range'))
+    value = models.IntegerField(
+        validators=[MinValueValidator(0), MaxValueValidator(100)],
+        default=50
+    )
 
 
 class MosResponse(Response):
@@ -124,10 +136,13 @@ class MosResponse(Response):
         related_name='responses'
     )
 
+    @property
+    def is_complete(self):
+        return self.value is not None
+
     @staticmethod
     def cook(feed, ingredient):
-        if not hasattr(feed, 'response'):
-            MosResponse(feed=feed, value=feed[int(ingredient)]).save()
-        else:
+        if ingredient is not None:
             feed.response.value = feed[int(ingredient)]
-            feed.response.save()
+        feed.response.clean()
+        feed.response.save()

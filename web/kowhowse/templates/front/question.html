@@ -15,16 +15,21 @@
 {% endblock %}
 
 {% block nav %}
-    {% nav_main form="question-form" %}
+{% nav_main form="question-form" %}
 {% endblock nav %}
 
 {% block main %}
-<form action="save"
+
+{% if error %}
+    {% alert message=error.message class="alert-warning" %}
+{% endif %}
+
+<form action=""
       method="post"
       id="question-form"
       role="form">
     {% csrf_token %}
-    <input type="hidden" name="feed" value="{{feed.id}}"></input>
+    <!--<input type="hidden" name="feed" value="{{feed.id}}"></input>-->
     <div class="d-flex flex-column">
         {% instruction instructable=feed.question error="No instruction for this question" %}
         {% block question %}

@@ -1,4 +1,5 @@
 import random
+
 from ..bitter import *
 from .pagination import Paginator
 
@@ -9,12 +10,12 @@ def allocate(survey, subject):
             section.feeds.create().save()
 
             for question in section.questions.all():
-                {   'AbQuestion': create_abfeed,
+                {
+                    'AbQuestion': create_abfeed,
                     'AbxQuestion': create_abxfeed,
                     'MosQuestion': create_mosfeed,
                     'MushraQuestion': create_mushrafeed
-                }[question.species]\
-                    (question.cast()) # newline just to fool Atom
+                }[question.species](question.cast())
 
 
 def create_abfeed(question):

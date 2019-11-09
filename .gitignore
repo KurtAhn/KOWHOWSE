@@ -5,3 +5,5 @@ media/
 migrations/
 __pycache__/
 *.sqlite3
+.todo
+.vscode/

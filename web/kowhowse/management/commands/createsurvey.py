@@ -1,12 +1,15 @@
-from django.core.management.base import BaseCommand, CommandError
-from django.core.files import File
-from kowhowse import bitter as B, sweet as S
 import sys, os
-from os import path
+from pathlib import Path
 from importlib import import_module
 from importlib.util import spec_from_file_location, module_from_spec
-from django.conf import settings
 from argparse import FileType
+
+from django.core.management.base import BaseCommand, CommandError
+from django.core.files import File
+from django.conf import settings
+
+from kowhowse import bitter as B, sweet as S
+
 
 class Command(BaseCommand):
     help = 'Create survey'
@@ -15,7 +18,7 @@ class Command(BaseCommand):
         parser.add_argument('script')
 
     def create_survey(self, script):
-        spec = spec_from_file_location('recipe', path.realpath(script))
+        spec = spec_from_file_location('recipe', Path(script).resolve())
         recipe = module_from_spec(spec)
         spec.loader.exec_module(recipe)
 
@@ -26,7 +29,10 @@ class Command(BaseCommand):
         )
         if _survey.instruction:
             with open(_survey.instruction) as f:
-                survey.instruction.save(path.basename(_survey.instruction), File(f))
+                survey.instruction.save(
+                    Path(_survey.instruction).name,
+                    File(f)
+                )
         survey.save()
         return _survey, survey
 
@@ -50,7 +56,10 @@ class Command(BaseCommand):
 
             if _section.instruction:
                 with open(_section.instruction) as f:
-                    section.instruction.save(path.basename(_section.instruction), File(f))
+                    section.instruction.save(
+                        Path(_section.instruction).name,
+                        File(f)
+                    )
             section.save()
 
             for _question in _section:
@@ -60,9 +69,51 @@ class Command(BaseCommand):
 
                 if _question.instruction:
                     with open(_question.instruction) as f:
-                        question.instruction.save(path.basename(_question.instruction), File(f))
+                        question.instruction.save(
+                            Path(_question.instruction).name,
+                            File(f)
+                        )
 
                 if isinstance(question, B.MosQuestion):
+                    question.num_scales = len(_question.scales)
+                    question.save()
+
+                    for _scale in _question.scales:
+                        try:
+                            question.scales.add(
+                                B.MosScale.objects.get(
+                                    description=_scale.description
+                                )
+                            )
+                        except (
+                            B.MosScale.DoesNotExist,
+                            B.MosScale.MultipleObjectsReturned
+                        ):
+                            scale = B.MosScale(
+                                description=_scale.description
+                            )
+                            scale.save()
+                            question.scales.add(scale)
+
+                            for _level in _scale.levels:
+                                try:
+                                    scale.levels.add(
+                                        B.MosLevel.objects.get(
+                                            description=_level.description,
+                                            value=_level.value
+                                        )
+                                    )
+                                except (
+                                    B.MosLevel.DoesNotExist,
+                                    B.MosScale.MultipleObjectsReturned
+                                ):
+                                    level = MosLevel(
+                                        description=_level.description,
+                                        value=_level.value
+                                    )
+                                    level.save()
+                                    scale.levels.add(level)
+
                     question.num_levels = len(_question.levels)
                     question.save()
                     for _level in _question.levels:
@@ -96,7 +147,10 @@ class Command(BaseCommand):
                         )
                         sample = samples[_sample]
                         with open(_sample.data, 'rb') as f:
-                            sample.data.save(path.join(system.description, path.basename(_sample.data)), File(f))
+                            sample.data.save(
+                                Path(system.description)/Path(_sample.data).name,
+                                File(f)
+                            )
                         sample.save()
                     question.samples.add(sample)
                 question.save()
