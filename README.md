@@ -19,7 +19,7 @@ You will also need to create a superuser account, so that you can grant yourself
 python web/manage.py createsuperuser
 ```
 
-To create a survey, write a Python script with a `survey_definition` function, where you define the structure of your survey. Example scripts can be found in `examples/`.
+To create a survey, write a Python script with a `survey_definition` function, where you define the structure of your survey. Self-contained examples can be found in `examples/`. You need to have Git LFS set up to be able to download the example audio files.
 
 Once you have your survey definition script, put the survey definition on the database:
 ```

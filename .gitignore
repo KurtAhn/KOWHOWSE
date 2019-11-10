@@ -1,4 +1,4 @@
-media/
+web/media/
 *.old
 *.pyc
 migrations/
