@@ -191,7 +191,7 @@ class MosLevel(Describable):
     scale = models.ForeignKey(
         'MosScale',
         on_delete=models.CASCADE,
-        related_name='%(class)ss'
+        related_name='levels'
     )
 
     def __hash__(self):
@@ -223,6 +223,21 @@ class MosScale(Describable):
                 _('At least one level required'),
                 code='invalid'
             )
+
+    def __getitem__(self, key):
+        if not hasattr(self, '_mapping'):
+            self._mapping = list(
+                self.levels.order_by('value')
+            )
+        return self._mapping[key]
+
+    def choices(self):
+        for k in range(self.levels.all().count()):
+            yield self[k]
+
+    @property
+    def response_str(self):
+        return f'response-{self.id}'
 
 
 class MosQuestion(Question):

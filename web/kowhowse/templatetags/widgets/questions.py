@@ -23,19 +23,44 @@ def aboption(value, response):
 @register.inclusion_tag('front/aboptions.html')
 def aboptions(feed):
     response = feed.response.value if hasattr(feed, 'response') else None
-    return {'options': [
-        dict(
-            value=k,
-            active=v == response,
-            audio=v
-        )
-        for k, v in feed.choices()
-    ]}
+    return dict(
+        options=[
+            dict(
+                value=k,
+                active=v == response,
+                audio=v
+            )
+            for k, v in feed.choices()
+        ]
+    )
 
 
-@register.inclusion_tag('front/mosoptions.html')
-def mosoptions(feed):
-    return {'feed': feed}
+@register.inclusion_tag('front/mosscales.html')
+def mosscales(feed):
+    return dict(
+        scales=[
+            dict(
+                name=f'response-{scale.id}',
+                description=scale.description,
+                levels=[
+                    dict(
+                        value=level.id,
+                        description=level.description,
+                        active=(
+                            feed.response.bits.get(scale_id=scale.id).value == level
+                            if (
+                                hasattr(feed, 'response') and
+                                feed.response.bits.exists() and 
+                                feed.response.bits.get(scale_id=scale.id).value is not None
+                            ) else False
+                        )
+                    )
+                    for level in scale.levels.order_by('value')
+                ]
+            )
+            for scale in feed.question.scales.order_by('id')
+        ]
+    )
 
 
 @register.inclusion_tag('front/mushrastimulus.html')

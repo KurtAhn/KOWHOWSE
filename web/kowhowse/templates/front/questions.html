@@ -8,4 +8,6 @@
     {% include "front/mosquestion.html" with feed=feed error=error %}
 {% elif feed.species == 'MushraFeed' %}
     {% include "front/mushraquestion.html" with feed=feed error=error %}
+{% else %}
+    {{feed.species}}
 {% endif %}

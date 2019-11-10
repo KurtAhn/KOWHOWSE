@@ -3,7 +3,7 @@ from django.utils.translation import gettext_lazy as _
 
 
 def validate_required(response):
-    if response.value is None:
+    if not response.is_complete:
         raise ValidationError(
             _('You must provide a response before moving onto another question.'),
             code='missing'
@@ -19,11 +19,12 @@ def validate_ab(response):
 
 
 def validate_mos(response):
-    if not response.feed.question.levels.filter(id=response.value.id).exists():
-        raise ValidationError(
-            _('Response value is not one of the provided options'),
-            code='corrupt'
-        )
+    for bit in response.feed.bits.all():
+        if not bit.scale.levels.filter(id=bit.value.id).exists():
+            raise ValidationError(
+                _('Response value is not one of the provided options'),
+                code='corrupt'
+            )
 
 
 def validate_mushra_above_90(response):

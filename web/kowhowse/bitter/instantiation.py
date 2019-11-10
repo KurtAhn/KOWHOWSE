@@ -253,7 +253,8 @@ class MosFeed(QuestionFeed):
         related_name='feeds'
     )
     sample = models.ForeignKey(
-        Audio, on_delete=models.CASCADE, related_name='mos_feeds')
+        Audio, on_delete=models.CASCADE, related_name='mos_feeds'
+    )
 
     def clean(self):
         if self.sample not in self.question.samples:
@@ -261,12 +262,14 @@ class MosFeed(QuestionFeed):
 
     def __getitem__(self, key):
         if not hasattr(self, '_mapping'):
-            self._mapping = list(self.question.levels.order_by('value'))
+            self._mapping = list(
+                self.question.scales.order_by('-id')
+            )
         return self._mapping[key]
 
-    def choices(self):
-        for k in range(self.question.levels.all().count()):
-            yield k, self[k]
+    def scales(self):
+        for k in range(self.question.scales.all().count()):
+            yield self[k]
 
 
 class EndFeed(Feed):

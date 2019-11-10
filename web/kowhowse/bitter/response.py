@@ -1,7 +1,9 @@
 from django.db import models
+from django.db.models.signals import post_init
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.utils.translation import gettext_lazy as _
+
 from .instantiation import *
 
 
@@ -130,19 +132,58 @@ class MosResponse(Response):
         on_delete=models.CASCADE,
         related_name='response'
     )
+
+    @property
+    def is_complete(self):
+        return all(
+            bit.is_complete
+            for bit in self.bits.all()
+        )
+
+    @staticmethod
+    def cook(feed, ingredient):
+        if ingredient is not None:
+            for k, v in ingredient.items():
+                bit = feed.response.bits.get(scale_id=int(k))
+                bit.value = MosLevel.objects.get(id=int(v))
+                bit.clean()
+                bit.save()
+        feed.response.clean()
+        feed.response.save()
+
+
+# Populate MosResponse with MosResponseBit obejcts
+def populate_mosresponse(**kwargs):
+    instance = kwargs.get('instance')
+    instance.save()
+    if not instance.bits.exists():
+        for scale in instance.feed.question.scales.order_by('id'):
+            MosResponseBit(
+                whole=instance,
+                scale=scale
+            ).save()
+    
+post_init.connect(populate_mosresponse, MosResponse)
+
+
+class MosResponseBit(models.Model):
+    whole = models.ForeignKey(
+        MosResponse,
+        on_delete=models.CASCADE,
+        related_name='bits'
+    )
+    scale = models.ForeignKey(
+        MosScale,
+        on_delete=models.CASCADE,
+        related_name='%(class)ss'
+    )
     value = models.ForeignKey(
         MosLevel,
         on_delete=models.CASCADE,
-        related_name='responses'
+        related_name='responses',
+        null=True
     )
 
     @property
     def is_complete(self):
         return self.value is not None
-
-    @staticmethod
-    def cook(feed, ingredient):
-        if ingredient is not None:
-            feed.response.value = feed[int(ingredient)]
-        feed.response.clean()
-        feed.response.save()

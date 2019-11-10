@@ -75,12 +75,21 @@ class QuestionsView(TemplateView):
 
     def post(self, request, *args, **kwargs):
         self.initialize(request, *args, **kwargs)
-        ingredient = {
-            k.replace('response-', ''): v
-            for k, v in self.request.POST.items()
-            if k.startswith('response-')
-        } if isinstance(self.feed, MushraFeed) \
-            else self.request.POST.get('response', None)
+
+        if isinstance(self.feed, MushraFeed):
+            ingredient = {
+                k.replace('response-', ''): v
+                for k, v in self.request.POST.items()
+                if k.startswith('response-')
+            }
+        elif isinstance(self.feed, MosFeed):
+            ingredient = {
+                k.replace('response-', ''): v
+                for k, v in self.request.POST.items()
+                if k.startswith('response-')
+            }
+        else:
+            ingredient = self.request.POST.get('response', None)
 
         try:
             Response.cook(self.feed, ingredient)

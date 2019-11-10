@@ -1,0 +1,16 @@
+{% load widgets %}
+
+{% with "d-flex flex-row align-items-center flex-grow-1 btn-primary" as class %}
+
+{% for scale in scales %}
+<span>{{scale.description}}</span>
+<div class="btn-group-vertical btn-group-toggle p-2
+            border" data-toggle="buttons">
+    {% for level in scale.levels %}
+        {% radio name=scale.name value=level.value class=class active=level.active %}
+            {{level.description}}
+        {% -radio %}
+    {% endfor %}
+</div>
+{% endfor %}
+{% endwith %}

@@ -96,38 +96,27 @@ class Command(BaseCommand):
                             question.scales.add(scale)
 
                             for _level in _scale.levels:
-                                try:
-                                    scale.levels.add(
-                                        B.MosLevel.objects.get(
-                                            description=_level.description,
-                                            value=_level.value
-                                        )
-                                    )
-                                except (
-                                    B.MosLevel.DoesNotExist,
-                                    B.MosScale.MultipleObjectsReturned
-                                ):
-                                    level = MosLevel(
-                                        description=_level.description,
-                                        value=_level.value
-                                    )
-                                    level.save()
-                                    scale.levels.add(level)
+                                level = B.MosLevel(
+                                    scale=scale,
+                                    description=_level.description,
+                                    value=_level.value
+                                )
+                                level.save()
 
-                    question.num_levels = len(_question.levels)
-                    question.save()
-                    for _level in _question.levels:
-                        try:
-                            question.levels.add(B.MosLevel.objects.get(
-                                description=_level.description,
-                                value=_level.value))
-                        except (B.MosLevel.DoesNotExist,
-                                B.MosLevel.MultipleObjectsReturned):
-                            level = B.MosLevel(
-                                description=_level.description,
-                                value=_level.value)
-                            level.save()
-                            question.levels.add(level)
+                    # question.num_levels = len(_question.levels)
+                    # question.save()
+                    # for _level in _question.levels:
+                    #     try:
+                    #         question.levels.add(B.MosLevel.objects.get(
+                    #             description=_level.description,
+                    #             value=_level.value))
+                    #     except (B.MosLevel.DoesNotExist,
+                    #             B.MosLevel.MultipleObjectsReturned):
+                    #         level = B.MosLevel(
+                    #             description=_level.description,
+                    #             value=_level.value)
+                    #         level.save()
+                    #         question.levels.add(level)
                 else:
                     question.save()
 
